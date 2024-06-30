@@ -1,20 +1,21 @@
 import {
-  Body,
   Controller,
   Get,
+  Param,
   Post,
-  UploadedFile,
+  Req,
+  UploadedFiles,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
-import { CreateProductDto } from './dto/create-product.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { Role } from 'src/auth/role.enum';
 import { Roles } from 'src/auth/roles.decorator';
 import { RolesGuard } from 'src/auth/roles.guard';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+import { Request } from 'express';
 
 @Controller('products')
 export class ProductsController {
@@ -29,20 +30,45 @@ export class ProductsController {
   }
 
   @Get(':id')
-  findOne(id: string) {
-    return this.productsService.findOne(id);
+  findOne(@Param('id') id: string) {
+    const decodedId = Buffer.from(id, 'base64').toString('utf-8');
+    return this.productsService.findOne(decodedId);
   }
 
   @UseGuards(AuthGuard)
   @Roles(Role.Admin)
   @UseGuards(RolesGuard)
   @Post()
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FilesInterceptor('files'))
   async create(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFiles() files: Express.Multer.File[],
+    @Req() req: Request,
   ) {
-    return this.cloudinaryService.uploadFile(file);
-    // console.log(imageUrl);
-    // return this.productsService.create(product);
+    const { name, description, price, stock } = req.body;
+    console.log(files);
+    const images: { publicId: string; url: string }[] = [];
+    if (files.length === 1) {
+      const imageFile = await this.cloudinaryService.uploadFile(files[0]);
+      images.push({
+        publicId: imageFile.public_id,
+        url: imageFile.secure_url,
+      });
+    } else {
+      for (const imageFile of files) {
+        const image = await this.cloudinaryService.uploadFile(imageFile);
+        images.push({
+          publicId: image.public_id,
+          url: image.secure_url,
+        });
+      }
+    }
+    const product = {
+      name,
+      description,
+      price,
+      stock,
+      images,
+    };
+    return this.productsService.create(product);
   }
 }

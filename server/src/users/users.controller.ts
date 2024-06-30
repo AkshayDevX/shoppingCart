@@ -2,9 +2,8 @@ import {
   Body,
   Controller,
   Get,
-  Param,
-  ParseIntPipe,
   Post,
+  Request,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
@@ -27,10 +26,12 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  //   @Get(':id')
-  //   findOne(@Param('id', ParseIntPipe) id: number) {
-  //     return this.usersService.findOne(id);
-  //   }
+  @UseGuards(AuthGuard)
+  @Get('me')
+  getUserProfile(@Request() req: any) {
+    const id = req.user.sub;
+    return this.usersService.getUserProfile(id);
+  }
 
   @Post()
   create(@Body(ValidationPipe) createUserDto: CreateUserDto) {

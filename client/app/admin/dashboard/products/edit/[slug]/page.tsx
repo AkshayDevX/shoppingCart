@@ -1,12 +1,29 @@
 "use client";
-import useAddProductMutation from "@/actions/products/addProduct";
 import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
+import { useParams } from "next/navigation";
+import { useGetSingleProductQuery } from "@/actions/products/getSingleProduct";
 
 const AddProducts: React.FC = () => {
-  const { mutate: addProduct, isSuccess, isPending } = useAddProductMutation();
+  const { slug } = useParams();
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const formRef = useRef<HTMLFormElement>(null);
+  const { data: product } = useGetSingleProductQuery(slug as string);
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState(0);
+  const [stock, setStock] = useState(0);
+  const [images, setImages] = useState<{ publicId: string; url: string }[]>([]);
+
+  useEffect(() => {
+    if (product) {
+      setName(product.name);
+      setDescription(product.description);
+      setPrice(product.price);
+      setStock(product.stock);
+      setImages(product.images);
+    }
+  }, [product]);
 
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
@@ -35,27 +52,18 @@ const AddProducts: React.FC = () => {
     ) {
       return toast.error("Only JPEG and PNG images are allowed");
     }
-    addProduct({
-      name: e.target.name.value,
-      description: e.target.description.value,
-      price: e.target.price.value,
-      stock: e.target.stock.value,
-      images: selectedImages,
-    });
+    // addProduct({
+    //   name: e.target.name.value,
+    //   description: e.target.description.value,
+    //   price: e.target.price.value,
+    //   stock: e.target.stock.value,
+    //   images: selectedImages,
+    // });
   };
-
-  useEffect(() => {
-    if (isSuccess) {
-      setSelectedImages([]);
-      if (formRef.current) {
-        formRef.current.reset();
-      }
-    }
-  }, [isSuccess]);
 
   return (
     <div className="mt-7">
-      <h1 className="text-xl font-bold">Add Products</h1>
+      <h1 className="text-xl font-bold">Edit</h1>
       <div className="mx-auto mt-5 w-96">
         <form
           className="flex flex-col justify-center items-center gap-2"
@@ -64,7 +72,7 @@ const AddProducts: React.FC = () => {
         >
           <label className="input input-bordered w-full flex items-center gap-2">
             Name
-            <input type="text" placeholder="Name" name="name" required />
+            <input type="text" placeholder="Name" name="name" required value={name} onChange={(e) => setName(e.target.value)} />
           </label>
           <label className="form-control">
             <div className="label">
@@ -75,6 +83,8 @@ const AddProducts: React.FC = () => {
               placeholder="Description"
               name="description"
               required
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
             ></textarea>
           </label>
           <label className="input input-bordered w-full flex items-center gap-2 mt-4">
@@ -85,6 +95,8 @@ const AddProducts: React.FC = () => {
               placeholder="Price"
               name="price"
               required
+              value={price}
+              onChange={(e: any) => setPrice(e.target.value)}
             />
           </label>
           <label className="input input-bordered w-full flex items-center gap-2 mt-4">
@@ -95,6 +107,8 @@ const AddProducts: React.FC = () => {
               placeholder="Stock"
               name="stock"
               required
+              value={stock}
+              onChange={(e: any) => setStock(e.target.value)}
             />
           </label>
           <input
@@ -123,14 +137,14 @@ const AddProducts: React.FC = () => {
               ))}
           </div>
           <button
-            disabled={isPending}
+            // disabled={isPending}
             className="btn btn-primary mt-6"
             type="submit"
           >
             Add Product
-            {isPending && (
+            {/* {isPending && (
               <span className="loading loading-spinner loading-sm"></span>
-            )}
+            )} */}
           </button>
         </form>
       </div>

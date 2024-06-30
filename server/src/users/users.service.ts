@@ -26,6 +26,10 @@ export class UsersService {
     return this.userModel.findOne({ username }).exec();
   }
 
+  async getUserProfile(id: string): Promise<User> {
+    return this.userModel.findById(id).select('-password').exec();
+  }
+
   async findAll(): Promise<any[]> {
     return this.userModel.find().exec();
   }

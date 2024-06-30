@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { SigninDto } from './dto/signin.dto';
 import * as bcrypt from 'bcrypt';
@@ -13,7 +13,7 @@ export class AuthService {
   async signIn(signinDto: SigninDto): Promise<{ access_token: string }> {
     const user = await this.usersService.findOne(signinDto.username);
     if (!user) {
-      throw new UnauthorizedException();
+      throw new BadRequestException("check your credentials");
     }
 
     const isPasswordMatch = await bcrypt.compare(
@@ -21,7 +21,7 @@ export class AuthService {
       user.password,
     );
     if (!isPasswordMatch) {
-      throw new UnauthorizedException();
+      throw new BadRequestException("check your credentials");
     }
     const payload = { sub: user._id, userRole: user.role
      };

@@ -6,8 +6,10 @@ import { IconContext } from "react-icons";
 import { FaPaperPlane } from "react-icons/fa";
 import { FaHome } from "react-icons/fa";
 import { usePathname } from "next/navigation";
+import useLogoutMutation from "@/actions/user/logoutUser";
 
 const AdminSidebar = () => {
+  const { mutate: logout } = useLogoutMutation();
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [openSidebar, setOpenSidebar] = useState<boolean>(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
@@ -45,7 +47,7 @@ const AdminSidebar = () => {
       {openSidebar && isMobile ? (
         <nav
           ref={sidebarRef}
-          className="flex flex-col z-10 items-start h-screen gap-4 w-4/5 bg-slate-950 fixed top-0 bottom-0 text-white overflow-auto hideScrollbar pb-9"
+          className="flex flex-col z-10 items-start h-screen gap-4 w-4/5 bg-slate-950 fixed top-0 bottom-0 text-white overflow-auto pb-9"
         >
           <div className="flex items-center py-5 mx-auto">
             <Image
@@ -116,6 +118,7 @@ const AdminSidebar = () => {
               </Link>
               <Link
                 href=""
+                onClick={() => logout()}
                 className="hover:bg-gray-700 py-3 px-4 rounded-lg w-full flex items-center"
               >
                 <svg
@@ -209,6 +212,7 @@ const AdminSidebar = () => {
               </Link>
               <Link
                 href={""}
+                onClick={() => logout()}
                 className="hover:bg-gray-700 py-3 px-4 rounded-lg w-full flex items-center"
               >
                 <svg
