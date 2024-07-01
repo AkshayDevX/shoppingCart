@@ -1,4 +1,5 @@
 "use client"
+import useDeleteProductMutation from "@/actions/products/deleteProduct";
 import { useProductsQuery } from "@/actions/products/getAllProducts";
 import Link from "next/link";
 import { FaEdit } from "react-icons/fa";
@@ -7,6 +8,17 @@ import { FaTrash } from "react-icons/fa";
 
 const ProductsListAdmin = () => {
   const { data: products } = useProductsQuery()
+  const { mutate: deleteProduct } = useDeleteProductMutation();
+
+
+  const handleProductDelete = (productId: string) => {
+    if (window.confirm("Are you sure you want to delete this product?")) {
+      deleteProduct({
+        id: productId,
+      });
+    }
+    return;
+  };
   return (
     <div className="mt-7">
         <div className="flex justify-between">
@@ -61,7 +73,7 @@ const ProductsListAdmin = () => {
                 </Link>
               </th>
               <th>
-                <button className="btn btn-error"><FaTrash /></button>
+                <button className="btn btn-error" onClick={() => handleProductDelete(btoa(product._id))}><FaTrash /></button>
               </th>
             </tr>
             ))}

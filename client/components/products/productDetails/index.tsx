@@ -1,76 +1,138 @@
-const ProductDetails = () => {
+import { Product } from "@/actions/products/getAllProducts";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import Loading from "@/components/layouts/loader";
+
+interface ProductProps {
+  product?: Product;
+  guestCartChange: (change: boolean ) => void;
+  isLoading: boolean;
+}
+
+const ProductDetails = ({
+  product,
+  guestCartChange,
+  isLoading,
+}: ProductProps) => {
+  const [productQuantity, setProductQuantity] = useState(1);
+  const [cartChange, setCartChange] = useState(false);
+
+  const incrementQuantity = () => {
+    const currentQuantity = productQuantity;
+
+    if (product && currentQuantity < product.stock) {
+      setProductQuantity(productQuantity + 1);
+    }
+  };
+
+  const decrementQuantity = () => {
+    if (productQuantity > 1) {
+      setProductQuantity(productQuantity - 1);
+    }
+  };
+
+  // add to cart
+  const addCart = (productId: string | undefined) => {
+    if (!product) {
+      return;
+    }
+    guestCartChange(cartChange);
+    setCartChange(!cartChange);
+    const guestCartString = localStorage.getItem("guestCart");
+    const guestCart = guestCartString ? JSON.parse(guestCartString) : [];
+    const existingCartItem = guestCart.find(
+      (item: any) => item?.productId == productId
+    );
+
+    if (existingCartItem) {
+      if (existingCartItem.quantity + productQuantity <= product.stock) {
+        const updatedQuantity = existingCartItem.quantity + productQuantity;
+        const updatedGuestCart = guestCart.map((item: any) =>
+          item.productId === productId
+            ? { ...item, quantity: updatedQuantity }
+            : item
+        );
+        localStorage.setItem("guestCart", JSON.stringify(updatedGuestCart));
+        toast.success("item added to cart");
+      } else {
+        toast.error("item out of stock");
+      }
+    } else {
+      guestCart.push({
+        _id: guestCart.length + 1,
+        productId,
+        image: product.images[0].url,
+        name: product.name,
+        stock: product.stock,
+        price: product.price,
+        quantity: productQuantity,
+      });
+
+      localStorage.setItem("guestCart", JSON.stringify(guestCart));
+      toast.success("item added to cart");
+    }
+  };
+
   return (
-    <div className="lg:flex md:flex mx-auto mt-24">
-      <div className="lg:w-1/2 md:w-1/2 flex justify-center items-center mb-6">
-        <div className="carousel rounded-box lg:w-96 md:96 w-64">
-          <div className="carousel-item w-full">
-            <img
-              src="https://img.daisyui.com/images/stock/photo-1559703248-dcaaec9fab78.jpg"
-              className="w-full"
-              alt="Tailwind CSS Carousel component"
-            />
+    <>
+      {isLoading ? (
+        <Loading />
+      ) : (
+        <div className="lg:flex md:flex mx-auto mt-24">
+          <div className="lg:w-1/2 md:w-1/2 flex justify-center items-center mb-6">
+            <div className="carousel rounded-box lg:w-96 md:w-96 w-64">
+              {product &&
+                product.images.map((image) => (
+                  <div className="carousel-item w-full" key={image.publicId}>
+                    <img
+                      src={image.url}
+                      className="w-full object-cover"
+                      alt={product.name}
+                    />
+                  </div>
+                ))}
+            </div>
           </div>
-          <div className="carousel-item w-full">
-            <img
-              src="https://img.daisyui.com/images/stock/photo-1565098772267-60af42b81ef2.jpg"
-              className="w-full"
-              alt="Tailwind CSS Carousel component"
-            />
-          </div>
-          <div className="carousel-item w-full">
-            <img
-              src="https://img.daisyui.com/images/stock/photo-1572635148818-ef6fd45eb394.jpg"
-              className="w-full"
-              alt="Tailwind CSS Carousel component"
-            />
-          </div>
-          <div className="carousel-item w-full">
-            <img
-              src="https://img.daisyui.com/images/stock/photo-1494253109108-2e30c049369b.jpg"
-              className="w-full"
-              alt="Tailwind CSS Carousel component"
-            />
-          </div>
-          <div className="carousel-item w-full">
-            <img
-              src="https://img.daisyui.com/images/stock/photo-1550258987-190a2d41a8ba.jpg"
-              className="w-full"
-              alt="Tailwind CSS Carousel component"
-            />
-          </div>
-          <div className="carousel-item w-full">
-            <img
-              src="https://img.daisyui.com/images/stock/photo-1559181567-c3190ca9959b.jpg"
-              className="w-full"
-              alt="Tailwind CSS Carousel component"
-            />
-          </div>
-          <div className="carousel-item w-full">
-            <img
-              src="https://img.daisyui.com/images/stock/photo-1601004890684-d8cbf643f5f2.jpg"
-              className="w-full"
-              alt="Tailwind CSS Carousel component"
-            />
+          <div className="lg:w-1/2 md:w-1/2 p-6 h-fit bg-white shadow-xl rounded-lg">
+            <h1 className="text-4xl font-extrabold text-primary mb-4">
+              {product && product.name}
+            </h1>
+            <hr className="border-t-2 border-gray-200 mb-4" />
+            <p className="text-base text-gray-600 mb-4">
+              {product && product.description}
+            </p>
+            <div className="mb-4">
+              <p className="text-lg font-semibold">Quantity:</p>
+              <div className="flex items-center mt-2">
+                <button
+                  onClick={() => decrementQuantity()}
+                  className="mr-2 btn btn-square btn-secondary btn-md"
+                >
+                  -
+                </button>
+                <p className="font-medium text-xl mx-2">{productQuantity}</p>
+                <button
+                  onClick={() => incrementQuantity()}
+                  className="ml-2 btn btn-square btn-secondary btn-md"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+            <p className="text-xl text-gray-900 font-bold mb-6">
+              Price: ${product && product.price}
+            </p>
+            <button
+              className="btn btn-warning w-full"
+              type="button"
+              onClick={() => addCart(product?._id)}
+            >
+              Add to cart
+            </button>
           </div>
         </div>
-      </div>
-      <div className="lg:w-1/2 md:w-1/2 p-6 bg-white shadow-lg rounded-lg">
-        <h1 className="text-3xl font-extrabold text-gray-900 mb-4">
-          Product Name
-        </h1>
-        <hr className="border-t-2 border-gray-200 mb-4"></hr>
-        <h1 className="text-2xl font-semibold text-gray-800 mb-2">
-          Description
-        </h1>
-        <p className="text-base text-gray-600 mb-4">
-          This is a great product that you will love.
-        </p>
-        <p className="text-lg text-gray-900 font-bold mb-6">Price: $200</p>
-        <button className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-300 ease-in-out">
-          Add to cart
-        </button>
-      </div>
-    </div>
+      )}
+    </>
   );
 };
 

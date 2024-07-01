@@ -1,7 +1,10 @@
 import {
+  Body,
   Controller,
+  Delete,
   Get,
   Param,
+  Patch,
   Post,
   Req,
   UploadedFiles,
@@ -45,7 +48,6 @@ export class ProductsController {
     @Req() req: Request,
   ) {
     const { name, description, price, stock } = req.body;
-    console.log(files);
     const images: { publicId: string; url: string }[] = [];
     if (files.length === 1) {
       const imageFile = await this.cloudinaryService.uploadFile(files[0]);
@@ -71,4 +73,59 @@ export class ProductsController {
     };
     return this.productsService.create(product);
   }
+
+  @UseGuards(AuthGuard)
+  @Roles(Role.Admin)
+  @UseGuards(RolesGuard)
+  @Patch(':id')
+  async deleteImage(@Param('id') id: string, @Body() body: any) {
+    await this.cloudinaryService.deleteFile(body.publicId);
+    const decodedId = Buffer.from(id, 'base64').toString('utf-8');
+    return this.productsService.deleteImage(decodedId, body.publicId);
+  }
+
+  @UseGuards(AuthGuard)
+  @Roles(Role.Admin)
+  @UseGuards(RolesGuard)
+  @Patch('update/:id')
+  @UseInterceptors(FilesInterceptor('files'))
+  async update(@Param('id') id: string, @Req() req: Request,  @UploadedFiles() files: Express.Multer.File[]) {
+    const { name, description, price, stock } = req.body;
+    const images: { publicId: string; url: string }[] = [];
+    if (files && files.length === 1) {
+      const imageFile = await this.cloudinaryService.uploadFile(files[0]);
+      images.push({
+        publicId: imageFile.public_id,
+        url: imageFile.secure_url,
+      });
+    } else if (files && files.length > 1) {
+      for (const imageFile of files) {
+        const image = await this.cloudinaryService.uploadFile(imageFile);
+        images.push({
+          publicId: image.public_id,
+          url: image.secure_url,
+        });
+      }
+    }
+    const product = {
+      name,
+      description,
+      price,
+      stock,
+      images,
+    };
+
+    const decodedId = Buffer.from(id, 'base64').toString('utf-8');
+    return this.productsService.update(decodedId, product);
+  }
+
+  @UseGuards(AuthGuard)
+  @Roles(Role.Admin)
+  @UseGuards(RolesGuard)
+  @Delete(':id')
+  async delete(@Param('id') id: string) {
+    const decodedId = Buffer.from(id, 'base64').toString('utf-8');
+    return this.productsService.delete(decodedId);
+  }
+  
 }

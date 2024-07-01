@@ -1,9 +1,6 @@
 "use client"
 
-import useGetLoginUserQuery from "@/actions/user/getLoginUser";
-
 export default function AdminDashboard() {
-  const { data } = useGetLoginUserQuery();
 
   return (
     <div className="mt-7">

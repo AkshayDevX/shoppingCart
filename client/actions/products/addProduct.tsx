@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import http from "../utils/http";
 
-interface ProductInput {
+export interface ProductInput {
   name: string;
   description: string;
   price: number;

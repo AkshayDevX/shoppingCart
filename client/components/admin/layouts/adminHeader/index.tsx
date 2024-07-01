@@ -1,10 +1,12 @@
 import Image from "next/image";
 
 interface User {
-  username: string;
+  user: {
+    username: string;
+  };
 }
 
-const AdminHeader = ({user}: {user: User}) => {
+const AdminHeader = ({user}: User) => {
   return (
     <>
       <nav className="flex py-5 border-b border-b-slate-600">
@@ -19,7 +21,7 @@ const AdminHeader = ({user}: {user: User}) => {
             alt="profile"
           />
           <div className="ml-2">
-            <h1 className="text-md">{user.username}</h1>
+            <h1 className="text-md">{user?.username}</h1>
             <h1 className="text-xs">ADMIN PANEL</h1>
           </div>
         </div>

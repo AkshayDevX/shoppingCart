@@ -3,12 +3,17 @@ import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useParams } from "next/navigation";
 import { useGetSingleProductQuery } from "@/actions/products/getSingleProduct";
+import useDeleteImageMutation from "@/actions/products/deleteProductImage";
+import useUpdateProductMutation from "@/actions/products/updateProduct";
 
 const AddProducts: React.FC = () => {
   const { slug } = useParams();
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const formRef = useRef<HTMLFormElement>(null);
   const { data: product } = useGetSingleProductQuery(slug as string);
+  const { mutate: deleteImage } = useDeleteImageMutation();
+  const { mutate: updateProduct, isPending: isUpdating } =
+    useUpdateProductMutation();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState(0);
@@ -36,9 +41,6 @@ const AddProducts: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement> | any) => {
     e.preventDefault();
-    if (selectedImages.length === 0) {
-      return toast.error("Please select at least one image");
-    }
     if (selectedImages.length > 5) {
       return toast.error("More than 5 images are not allowed");
     }
@@ -52,15 +54,16 @@ const AddProducts: React.FC = () => {
     ) {
       return toast.error("Only JPEG and PNG images are allowed");
     }
-    // addProduct({
-    //   name: e.target.name.value,
-    //   description: e.target.description.value,
-    //   price: e.target.price.value,
-    //   stock: e.target.stock.value,
-    //   images: selectedImages,
-    // });
+    updateProduct({
+      id: slug as string,
+      name: name,
+      description: description,
+      price: price,
+      stock: stock,
+      images: selectedImages,
+    });
   };
-
+ 
   return (
     <div className="mt-7">
       <h1 className="text-xl font-bold">Edit</h1>
@@ -72,7 +75,14 @@ const AddProducts: React.FC = () => {
         >
           <label className="input input-bordered w-full flex items-center gap-2">
             Name
-            <input type="text" placeholder="Name" name="name" required value={name} onChange={(e) => setName(e.target.value)} />
+            <input
+              type="text"
+              placeholder="Name"
+              name="name"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
           </label>
           <label className="form-control">
             <div className="label">
@@ -115,8 +125,36 @@ const AddProducts: React.FC = () => {
             type="file"
             multiple
             className="file-input file-input-bordered w-full mt-4"
+            disabled={selectedImages.length + images.length >= 5}
             onChange={handleImageChange}
           />
+          {selectedImages.length + images.length >= 5 && (
+            <p className="text-red-500 text-sm mt-1">image limit reached</p>
+          )}
+          <div className="flex flex-wrap gap-2 mt-4">
+            {images &&
+              images.map((image) => (
+                <div key={image.publicId} className="relative">
+                  <img
+                    src={image.url}
+                    alt={`Selected ${image.publicId}`}
+                    className="w-24 h-24 object-cover"
+                  />
+                  <button
+                    type="button"
+                    className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
+                    onClick={() =>
+                      deleteImage({
+                        id: slug as string,
+                        publicId: image.publicId,
+                      })
+                    }
+                  >
+                    &times;
+                  </button>
+                </div>
+              ))}
+          </div>
           <div className="flex flex-wrap gap-2 mt-4">
             {selectedImages &&
               selectedImages.map((image, index) => (
@@ -137,14 +175,14 @@ const AddProducts: React.FC = () => {
               ))}
           </div>
           <button
-            // disabled={isPending}
+            disabled={isUpdating}
             className="btn btn-primary mt-6"
             type="submit"
           >
-            Add Product
-            {/* {isPending && (
+            Update
+            {isUpdating && (
               <span className="loading loading-spinner loading-sm"></span>
-            )} */}
+            )}
           </button>
         </form>
       </div>
