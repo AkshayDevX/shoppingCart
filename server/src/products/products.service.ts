@@ -1,6 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, isValidObjectId } from 'mongoose';
 import { Product } from 'src/schema/product.schema';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -10,11 +10,23 @@ export class ProductsService {
   constructor(@InjectModel(Product.name) private userModel: Model<Product>) {}
 
   async findAll(): Promise<Product[]> {
-    return this.userModel.find().exec();
+    const products = await this.userModel.find().exec();
+    if (!products) {
+      throw new NotFoundException('products not found');
+    }
+    return products;
   }
 
   async findOne(id: string): Promise<Product> {
-    return this.userModel.findById(id).exec();
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException('invalid id');
+    }
+    const product = await this.userModel.findById(id).exec()
+
+    if (!product) {
+      throw new NotFoundException('product not found')
+    }
+    return product;
   }
 
   async create(product: CreateProductDto): Promise<Product> {
@@ -23,6 +35,9 @@ export class ProductsService {
   }
 
   async deleteImage(id: string, publicId: string): Promise<Product> {
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException('invalid id');
+    }
     const updatedProduct = await this.userModel
       .findByIdAndUpdate(
         id,
@@ -38,6 +53,9 @@ export class ProductsService {
   }
 
   async update(id: string, updatedProduct: UpdateProductDto): Promise<Product> {
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException('invalid id');
+    }
     const product = await this.userModel.findByIdAndUpdate(
       id,
       {
@@ -56,6 +74,9 @@ export class ProductsService {
   }
 
   async delete(id: string) {
+    if (!isValidObjectId(id)) {
+      throw new BadRequestException('invalid id');
+    }
     return this.userModel.findByIdAndDelete(id);
   }
 }

@@ -5,11 +5,11 @@ import Header from "@/components/layouts/header";
 import ProductCard from "@/components/products/productCard";
 
 export default function Home() {
-  const { data: products } = useProductsQuery();
+  const { data: products, isPending } = useProductsQuery();
   return (
     <div>
       <Header />
-      <ProductCard products={products} />
+      <ProductCard products={products} isLoading={isPending} />
       <Footer />
     </div>
   );

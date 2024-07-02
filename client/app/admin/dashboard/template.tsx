@@ -3,7 +3,7 @@ import AdminHeader from "@/components/admin/layouts/adminHeader";
 import AdminSidebar from "@/components/admin/layouts/adminSidebar";
 import { getUserFromToken } from "@/lib/auth";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Cookies from "js-cookie";
 import Loading from "@/components/layouts/loader";
 import useGetLoginUserQuery from "@/actions/user/getLoginUser";
@@ -26,7 +26,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
       }
     }
     checkAuth();
-  }, [data]);
+  }, []);
   return (
     <>
       {loading ? (

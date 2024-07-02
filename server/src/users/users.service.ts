@@ -1,5 +1,5 @@
 import * as bcrypt from 'bcrypt';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from 'src/schema/user.schema';
@@ -23,7 +23,11 @@ export class UsersService {
   }
 
   async findOne(username: string): Promise<User> {
-    return this.userModel.findOne({ username }).exec();
+    const user = await this.userModel.findOne({ username }).exec();
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 
   async getUserProfile(id: string): Promise<User> {
@@ -31,6 +35,10 @@ export class UsersService {
   }
 
   async findAll(): Promise<any[]> {
-    return this.userModel.find().exec();
+    const users = await this.userModel.find().exec();
+    if (!users) {
+      throw new NotFoundException('Users not found');
+    }
+    return users;
   }
 }

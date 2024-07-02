@@ -18,6 +18,7 @@ import { RolesGuard } from 'src/auth/roles.guard';
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
+  // get all users (admin)
   @UseGuards(AuthGuard)
   @Roles(Role.Admin)
   @UseGuards(RolesGuard)
@@ -26,6 +27,7 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  // get user profile for authenticated users
   @UseGuards(AuthGuard)
   @Get('me')
   getUserProfile(@Request() req: any) {
@@ -33,6 +35,7 @@ export class UsersController {
     return this.usersService.getUserProfile(id);
   }
 
+  // create a user
   @Post()
   create(@Body(ValidationPipe) createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);

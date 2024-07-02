@@ -17,6 +17,7 @@ const ProductDetails = ({
   const [productQuantity, setProductQuantity] = useState(1);
   const [cartChange, setCartChange] = useState(false);
 
+  // increment quantity
   const incrementQuantity = () => {
     const currentQuantity = productQuantity;
 
@@ -25,6 +26,7 @@ const ProductDetails = ({
     }
   };
 
+  // decrement quantity
   const decrementQuantity = () => {
     if (productQuantity > 1) {
       setProductQuantity(productQuantity - 1);
@@ -126,8 +128,11 @@ const ProductDetails = ({
               className="btn btn-warning w-full"
               type="button"
               onClick={() => addCart(product?._id)}
+              disabled={product && productQuantity > product?.stock}
             >
-              Add to cart
+              {product && productQuantity > product?.stock
+                ? "Out of stock"
+                : "Add to cart"}
             </button>
           </div>
         </div>

@@ -34,7 +34,6 @@ const useAddProductMutation = () => {
       toast.success("product added successfully");
     },
     onError: (error: any) => {
-      console.log(error);
       const message = error.response.data.message;
       toast.error(message);
     },

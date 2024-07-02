@@ -4,27 +4,24 @@ import useLoginUserMutation from "@/actions/user/signInUser";
 import { getUserFromToken } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
-import Cookies from 'js-cookie';
-
-
+import Cookies from "js-cookie";
 
 export default function Login() {
-  const { mutate: login, isPending, isSuccess } = useLoginUserMutation();
+  const { mutate: login, isPending } = useLoginUserMutation();
   const router = useRouter();
 
   useEffect(() => {
     async function checkAuth() {
-      const token = Cookies.get('token');
+      const token = Cookies.get("token");
       if (token) {
         const user = await getUserFromToken(token);
         if (user) {
-          router.replace('/admin/dashboard');
+          router.replace("/admin/dashboard");
         }
       }
     }
     checkAuth();
   }, []);
-
 
   const handleLogin = (e: React.FormEvent<HTMLFormElement> | any) => {
     e.preventDefault();
@@ -75,8 +72,15 @@ export default function Login() {
               name="password"
             />
           </label>
-          <button type="submit" className="btn btn-primary w-full mt-4">
+          <button
+            disabled={isPending}
+            type="submit"
+            className="btn btn-primary w-full mt-4"
+          >
             Login
+            {isPending && (
+              <span className="loading loading-spinner loading-sm"></span>
+            )}
           </button>
         </div>
       </form>

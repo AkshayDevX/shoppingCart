@@ -39,7 +39,6 @@ const useUpdateProductMutation = () => {
       queryClient.refetchQueries({ queryKey: ["getAllProducts"], exact: true })
     },
     onError: (error: any) => {
-      console.log(error);
       const message = error.response.data.message;
       toast.error(message);
     },

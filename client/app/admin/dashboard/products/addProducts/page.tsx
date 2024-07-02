@@ -8,15 +8,18 @@ const AddProducts: React.FC = () => {
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const formRef = useRef<HTMLFormElement>(null);
 
+  // Handle image selection
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
     setSelectedImages((prevImages) => [...prevImages, ...files]);
   };
 
+  // Handle image deletion
   const handleImageDelete = (index: number) => {
     setSelectedImages((prevImages) => prevImages.filter((_, i) => i !== index));
   };
 
+  // add product
   const handleSubmit = (e: React.FormEvent<HTMLFormElement> | any) => {
     e.preventDefault();
     if (selectedImages.length === 0) {
@@ -44,6 +47,7 @@ const AddProducts: React.FC = () => {
     });
   };
 
+  // reset form on success
   useEffect(() => {
     if (isSuccess) {
       setSelectedImages([]);

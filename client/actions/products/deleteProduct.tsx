@@ -18,7 +18,7 @@ const useDeleteProductMutation = () => {
     onError: (error: any) => {
       console.log(error);
       const message = error.response.data.message;
-      toast.error(message);
+      toast.error("something went wrong");
     },
   });
 };

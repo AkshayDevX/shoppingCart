@@ -21,9 +21,8 @@ const useDeleteImageMutation = () => {
       queryClient.refetchQueries({ queryKey: ["geSingleProduct"] , exact: true});
     },
     onError: (error: any) => {
-      console.log(error);
       const message = error.response.data.message;
-      toast.error(message);
+      toast.error("Failed to delete image");
     },
   });
 };

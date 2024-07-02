@@ -20,6 +20,7 @@ const AddProducts: React.FC = () => {
   const [stock, setStock] = useState(0);
   const [images, setImages] = useState<{ publicId: string; url: string }[]>([]);
 
+
   useEffect(() => {
     if (product) {
       setName(product.name);
@@ -30,15 +31,18 @@ const AddProducts: React.FC = () => {
     }
   }, [product]);
 
+  // Handle image selection
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
     setSelectedImages((prevImages) => [...prevImages, ...files]);
   };
 
+  // Handle image deletion client side
   const handleImageDelete = (index: number) => {
     setSelectedImages((prevImages) => prevImages.filter((_, i) => i !== index));
   };
 
+  // update product
   const handleSubmit = (e: React.FormEvent<HTMLFormElement> | any) => {
     e.preventDefault();
     if (selectedImages.length > 5) {

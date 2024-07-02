@@ -27,17 +27,20 @@ export class ProductsController {
     private cloudinaryService: CloudinaryService,
   ) {}
 
+  // get all products
   @Get()
   findAll() {
     return this.productsService.findAll();
   }
 
+  // get one product
   @Get(':id')
   findOne(@Param('id') id: string) {
     const decodedId = Buffer.from(id, 'base64').toString('utf-8');
     return this.productsService.findOne(decodedId);
   }
 
+  // create a new product (admin)
   @UseGuards(AuthGuard)
   @Roles(Role.Admin)
   @UseGuards(RolesGuard)
@@ -74,6 +77,7 @@ export class ProductsController {
     return this.productsService.create(product);
   }
 
+  // delete image (admin)
   @UseGuards(AuthGuard)
   @Roles(Role.Admin)
   @UseGuards(RolesGuard)
@@ -84,6 +88,7 @@ export class ProductsController {
     return this.productsService.deleteImage(decodedId, body.publicId);
   }
 
+  // update product (admin)
   @UseGuards(AuthGuard)
   @Roles(Role.Admin)
   @UseGuards(RolesGuard)
@@ -119,6 +124,7 @@ export class ProductsController {
     return this.productsService.update(decodedId, product);
   }
 
+  // delete product (admin)
   @UseGuards(AuthGuard)
   @Roles(Role.Admin)
   @UseGuards(RolesGuard)

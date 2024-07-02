@@ -8,9 +8,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { CloudinaryModule } from './cloudinary/cloudinary.module';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(),MongooseModule.forRoot(process.env.DATABASE_URL), ProductsModule, UsersModule, AuthModule, CloudinaryModule],
+  imports: [ConfigModule.forRoot(),MongooseModule.forRoot(process.env.DATABASE_URL), ProductsModule, UsersModule, AuthModule, CloudinaryModule, OrdersModule],
   controllers: [AppController, ProductsController],
   providers: [AppService],
 })
