@@ -39,10 +39,14 @@ CLOUDINARY_API_SECRET="your_cloudinary_api_secret"
 
 ### Create Admin User
 
-To get admin access, create an admin user using Postman or any other API tool. Use the following endpoint with a POST request:
+To get admin access, create an admin user using Postman or any other API tool. Use the following endpoint with a POST request by providing following inputs in JSON:
 
 ```bash
 http://localhost:8000/users
+
+username:
+password:
+role: "admin"
 ```
 
 ### Running the Server
