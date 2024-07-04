@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import toast from "react-hot-toast";
 import http from "../utils/http";
 
 interface imageInput {
@@ -16,13 +15,12 @@ const useDeleteImageMutation = () => {
     const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (input: imageInput) => deleteImage(input),
-    onSuccess: (_data, _variables) => {
-      toast.success("Image deleted successfully");
-      queryClient.refetchQueries({ queryKey: ["geSingleProduct"] , exact: true});
+    onSuccess: (_data, variables) => {
+      queryClient.refetchQueries({ queryKey: [`geSingleProduct${variables.id}`] , exact: true});
     },
     onError: (error: any) => {
       const message = error.response.data.message;
-      toast.error("Failed to delete image");
+      // toast.error("Failed to delete image");
     },
   });
 };

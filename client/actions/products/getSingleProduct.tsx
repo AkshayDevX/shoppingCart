@@ -9,7 +9,7 @@ const fetchProduct = async (id: string) => {
 
 export const useGetSingleProductQuery = (id: string) => {
   return useQuery<Product>({
-    queryKey: ["geSingleProduct"],
+    queryKey: [`geSingleProduct${id}`],
     queryFn: () => fetchProduct(id),
   });
 };

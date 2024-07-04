@@ -26,7 +26,7 @@ const fetchOrders = async () => {
 
 export const useOrdersQuery = () => {
   return useQuery<Order[]>({
-    queryKey: ["getAllProducts"],
+    queryKey: ["getAllOrders"],
     queryFn: fetchOrders,
   });
 };

@@ -11,7 +11,7 @@ const AddProducts: React.FC = () => {
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const formRef = useRef<HTMLFormElement>(null);
   const { data: product } = useGetSingleProductQuery(slug as string);
-  const { mutate: deleteImage } = useDeleteImageMutation();
+  const { mutateAsync: deleteImage } = useDeleteImageMutation();
   const { mutate: updateProduct, isPending: isUpdating } =
     useUpdateProductMutation();
   const [name, setName] = useState("");
@@ -19,7 +19,6 @@ const AddProducts: React.FC = () => {
   const [price, setPrice] = useState(0);
   const [stock, setStock] = useState(0);
   const [images, setImages] = useState<{ publicId: string; url: string }[]>([]);
-
 
   useEffect(() => {
     if (product) {
@@ -67,7 +66,16 @@ const AddProducts: React.FC = () => {
       images: selectedImages,
     });
   };
- 
+
+  // delete images from server
+  const imageDelete = (id: string, publicId: string) => {
+    toast.promise(deleteImage({ id, publicId }), {
+      loading: "Deleting image",
+      success: "Image deleted successfully",
+      error: "Failed to delete image",
+    });
+  };
+
   return (
     <div className="mt-7">
       <h1 className="text-xl font-bold">Edit</h1>
@@ -147,12 +155,7 @@ const AddProducts: React.FC = () => {
                   <button
                     type="button"
                     className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
-                    onClick={() =>
-                      deleteImage({
-                        id: slug as string,
-                        publicId: image.publicId,
-                      })
-                    }
+                    onClick={() => imageDelete(slug as string, image.publicId)}
                   >
                     &times;
                   </button>

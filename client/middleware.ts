@@ -9,11 +9,11 @@ async function adminMiddleware(req: NextRequest) {
   }
   const user = await getUserFromToken(token.value);
 
-  if (token && user.role === "admin") {
-    return NextResponse.next();
-  } else {
+  if (token && user.role != "admin") {
     return NextResponse.redirect(new URL('/', req.url));
   }
+    return NextResponse.next();
+  
 }
 
 // Login page middleware function
@@ -43,8 +43,4 @@ export async function middleware(req: NextRequest) {
   }
 
   return NextResponse.next();
-}
-
-export const config = {
-  matcher: ['/admin/dashborad/:path*', '/admin'],
 }
